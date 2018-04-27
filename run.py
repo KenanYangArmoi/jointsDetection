@@ -6,11 +6,11 @@ import tensorflow as tf
 import numpy as np
 import os
 
-train_batch_size = 1
-vali_batch_size = 500
+train_batch_size = 128
+vali_batch_size = 1000
 learning_rate = 1E-4
 # Round_1_STEP = 1
-MAX_STEP = 11
+MAX_STEP = 10000
 
 vali_acc_highest = 0
 
@@ -138,6 +138,7 @@ def run_model():
                     # checkpoint_path = os.path.join(logs_dir, 'model.ckpt')
                     # saver.save(sess, checkpoint_path, global_step=step)
                     if vali_acc > vali_acc_highest:
+                        vali_acc_highest = vali_acc
                         checkpoint_path = os.path.join(vali_logs_dir, 'model.ckpt')
                         saver.save(sess, checkpoint_path, global_step=step)
                     # acc = accuracy_evaluation(vali_image_dir, vali_label, vali_mark, batch_size)

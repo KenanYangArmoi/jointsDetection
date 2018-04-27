@@ -33,9 +33,9 @@ class loadInput():
         image_dir = tf.cast(image_dir, tf.string) # In tensorflow format
         return image_dir
 
-    def get_train_validation_test_set(self, image_dir, labels, marks): # 5% to validate and 15% to test
-        validation_size = 500
-        test_size = 1500
+    def get_train_validation_test_set(self, image_dir, labels, marks): # 10% to validate and 10% to test
+        validation_size = 1000
+        test_size = 1000
         partitions = [0] * 10000
         partitions[:validation_size] = [1] * validation_size
         partitions[validation_size:validation_size+test_size] = [2] * test_size

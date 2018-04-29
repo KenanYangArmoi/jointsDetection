@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 train_batch_size = 128
-vali_batch_size = 1000
+vali_batch_size = 800
 learning_rate = 1E-4
 # Round_1_STEP = 1
 MAX_STEP = 7000

@@ -12,7 +12,7 @@ class loadInput():
         mark_mat = sio.loadmat(mark_dir)
         label_mat = sio.loadmat(label_dir)
         marks_mat = mark_mat['joints_mark']
-        labels_mat = label_mat['joints_label_positive']
+        labels_mat = label_mat['new_joints_label']
 
         # marks = np.array(marks_mat)  # marks in a shape of (14 ,1, 10000)
         marks_tf = tf.cast(marks_mat, tf.float32)

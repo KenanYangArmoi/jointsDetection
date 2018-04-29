@@ -10,17 +10,17 @@ train_batch_size = 128
 vali_batch_size = 1000
 learning_rate = 1E-4
 # Round_1_STEP = 1
-MAX_STEP = 10000
+MAX_STEP = 7000
 
 vali_acc_highest = 0
 
-logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs'
-vali_logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs/vali'
+logs_dir = '/home/Kenany/db/logs'
+vali_logs_dir = '/home/Kenany/db/logs/vali'
 
-files_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/new_images/'
+files_dir = '/home/Kenany/document/new_images/'
 
-mark_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/joints_mark.mat'
-label_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/joints_label_positive.mat'
+mark_dir = '/home/Kenany/document/joints_mark.mat'
+label_dir = '/home/Kenany/document/new_joints_label.mat'
 
 # load data:
 l_d = loadInput.loadInput()
@@ -96,7 +96,7 @@ def run_model():
                 ##########################
                 #####start training#######
                 train_value = {
-                    keep_prop : 0.5,
+                    keep_prop : 0.8,
                     is_training: True,
                     batch_size : train_batch_size,
                     image_batch : sess.run(train_image_batch),
@@ -106,7 +106,7 @@ def run_model():
                 _,tra_loss, tra_acc = sess.run([train_op, loss, acc],feed_dict=train_value)
                 ##########################
                 ##########################
-                if step % 1 == 0:
+                if step % 50 == 0:
                     # tra_loss, tra_acc = sess.run([train_loss, train_acc])
 
 
@@ -132,12 +132,13 @@ def run_model():
                     # # saver.save(sess, checkpoint_path, global_step=step)
                     # saver.save(sess, checkpoint_path)
 
-                if step % 5 == 0 or (step + 1) == MAX_STEP:
+                if step % 500 == 0 or (step + 1) == MAX_STEP:
                     vali_acc = sess.run(acc, feed_dict=vali_value)
                     print('Step %d, validation accuracy = %.5f' % (step, vali_acc))
                     # checkpoint_path = os.path.join(logs_dir, 'model.ckpt')
                     # saver.save(sess, checkpoint_path, global_step=step)
                     if vali_acc > vali_acc_highest:
+                        print('updata logs')
                         vali_acc_highest = vali_acc
                         checkpoint_path = os.path.join(vali_logs_dir, 'model.ckpt')
                         saver.save(sess, checkpoint_path, global_step=step)

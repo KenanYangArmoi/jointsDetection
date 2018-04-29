@@ -12,7 +12,7 @@ learning_rate = 1E-4
 # Round_1_STEP = 1
 MAX_STEP = 7000
 
-vali_acc_highest = 0
+
 
 logs_dir = '/home/Kenany/db/logs'
 vali_logs_dir = '/home/Kenany/db/logs/vali'
@@ -73,6 +73,9 @@ def run_model():
         saver = tf.train.Saver(max_to_keep=3)
         # initialize the variables
         sess.run(tf.global_variables_initializer())
+        
+        vali_acc_highest = 0
+        
         vali_batch = l_d.get_validation_images(vali_image_dir)
         vali_value = {
             keep_prop: 1,

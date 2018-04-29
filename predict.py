@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 file_dir = '/home/Kenany/document/new_images/im00552.jpg'
-logs_dir = '/home/Kenany/db/logs'
+logs_dir = '/home/Kenany/db/logs/vali'
 
 def prediction(logs_dir, file_dir):
     with tf.Session() as sess:

@@ -7,7 +7,7 @@ logs_dir = '/home/Kenany/db/logs'
 
 def prediction(logs_dir, file_dir):
     with tf.Session() as sess:
-        model_dir = os.path.join(logs_dir, 'model.ckpt-499.meta')
+        model_dir = os.path.join(logs_dir, 'model.ckpt-3000.meta')
         ckpt = tf.train.get_checkpoint_state(logs_dir)
         saver = tf.train.import_meta_graph(model_dir)
         saver.restore(sess, ckpt.model_checkpoint_path)

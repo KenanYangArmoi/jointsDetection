@@ -2,8 +2,8 @@ import tensorflow as tf
 import os
 import numpy as np
 
-file_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/new_images/im00552.jpg'
-logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs0423_coordinate_loss'
+file_dir = '/home/Kenany/document/new_images/im00552.jpg'
+logs_dir = '/home/Kenany/db/logs'
 
 def prediction(logs_dir, file_dir):
     with tf.Session() as sess:

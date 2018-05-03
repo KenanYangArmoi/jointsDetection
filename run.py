@@ -17,10 +17,10 @@ MAX_STEP = 7000
 logs_dir = '/home/Kenany/db/logs'
 vali_logs_dir = '/home/Kenany/db/logs/vali'
 
-files_dir = '/home/Kenany/document/new_images/'
+files_dir = '/home/Kenany/crop/new_images_crop/'
 
 mark_dir = '/home/Kenany/document/joints_mark.mat'
-label_dir = '/home/Kenany/document/new_joints_label.mat'
+label_dir = '/home/Kenany/crop/crop_coordinate.mat'
 
 # load data:
 l_d = loadInput.loadInput()

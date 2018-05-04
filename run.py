@@ -150,7 +150,7 @@ def run_model():
                         saver.save(sess, checkpoint_path, global_step=step)
                     else:
                         plateaus = plateaus + 1
-                        if plateaus is 2
+                        if plateaus == 2:
                             plateaus = 0
                             learn = learn/10
                         

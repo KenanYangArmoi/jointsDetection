@@ -12,7 +12,7 @@ vali_batch_size = 800
 # Round_1_STEP = 1
 MAX_STEP = 10000
 
-plateaus = 0
+
 
 
 logs_dir = '/home/Kenany/db/logs'
@@ -78,6 +78,7 @@ def run_model():
         
         vali_acc_highest = 0
         learn = 1E-3
+        plateaus = 0
         
         vali_batch = l_d.get_validation_images(vali_image_dir)
         vali_value = {
@@ -145,6 +146,7 @@ def run_model():
                     # checkpoint_path = os.path.join(logs_dir, 'model.ckpt')
                     # saver.save(sess, checkpoint_path, global_step=step)
                     if vali_acc > vali_acc_highest:
+                        plateaus = 0
                         print('updata logs')
                         vali_acc_highest = vali_acc
                         checkpoint_path = os.path.join(vali_logs_dir, 'model.ckpt')

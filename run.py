@@ -11,7 +11,7 @@ vali_batch_size = 800
 # learning_rate = 1E-3
 # Round_1_STEP = 1
 MAX_STEP = 10000
-learn = 1E-3
+
 plateaus = 0
 
 
@@ -77,6 +77,7 @@ def run_model():
         sess.run(tf.global_variables_initializer())
         
         vali_acc_highest = 0
+        learn = 1E-3
         
         vali_batch = l_d.get_validation_images(vali_image_dir)
         vali_value = {

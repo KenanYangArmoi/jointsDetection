@@ -12,7 +12,7 @@ class loadInput():
         mark_mat = sio.loadmat(mark_dir)
         label_mat = sio.loadmat(label_dir)
         marks_mat = mark_mat['joints_mark']
-        labels_mat = label_mat['crop_coordinate']
+        labels_mat = label_mat['ResLabel']
 
         # marks = np.array(marks_mat)  # marks in a shape of (14 ,1, 10000)
         marks_tf = tf.cast(marks_mat, tf.float32)
@@ -34,8 +34,8 @@ class loadInput():
         return image_dir
 
     def get_train_validation_test_set(self, image_dir, labels, marks): # 10% to validate and 10% to test
-        validation_size = 800
-        test_size = 1200
+        validation_size = 1000
+        test_size = 1000
         partitions = [0] * 10000
         partitions[:validation_size] = [1] * validation_size
         partitions[validation_size:validation_size+test_size] = [2] * test_size
@@ -50,8 +50,8 @@ class loadInput():
                train_mark, vali_mark, test_mark
 
     def get_batch(self, image_dir, labels, marks, batch_size):
-        target_H = 220
-        target_W = 220
+        target_H = 224
+        target_W = 224
         num_channels = 3
         # new_central = tf.constant(110, dtype=tf.float32, shape=[14,2]) # new_central = [target_H/2, target_W/2]
 
@@ -105,7 +105,7 @@ class loadInput():
     #     return im_standardized, height, new_h
     def get_validation_images(self, image_dir):
         with tf.Session() as sess:
-            target_H, target_W, num_channels = 220, 220, 3
+            target_H, target_W, num_channels = 224, 224, 3
             x = sess.run(tf.shape(image_dir))[0]
             image_batch = []
             for i in range(x):

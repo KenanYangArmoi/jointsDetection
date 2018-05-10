@@ -123,7 +123,7 @@ def run_model():
                         if plateaus == 5:
                             plateaus = 0
                             learn = learn / 5
-                                print('Learning rate: %f' % (learn))
+                            print('Learning rate: %f' % (learn))
         except tf.errors.OutOfRangeError:
             print('Done training -- epoch limit reached')
         finally:

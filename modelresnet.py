@@ -316,7 +316,7 @@ class Model:
         #                            [x1, y1],
         #                              ...
         #                            [x13,y13]] in each batch cell
-        with tf.variable_scope('loss'):
+        with tf.variable_scope('loss') as scope:
             logits_xy = tf.reshape(logits, [batch_size, 14, 2])
             # coordinate_diff = (logits_xy - labels) * (marks + 1E-10)
             # norm_cell = tf.norm(coordinate_diff, axis=2, keepdims=True)
@@ -329,7 +329,7 @@ class Model:
 
     def training(self, loss, learning_rate):
         # use adam to do optimization, learning_rate = (1e-3, 5e-4)
-        with tf.variable_scope('train'):
+        with tf.variable_scope('train') as scope:
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
                 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -338,7 +338,7 @@ class Model:
             return train_op
 
     def evaluate(self, logits, labels, marks, batch_size):
-        with tf.variable_scope('accuracy'):
+        with tf.variable_scope('accuracy') as scope:
             logits_xy = tf.reshape(logits, [batch_size, 14, 2])
             coordinate_diff = (logits_xy - labels) * marks
             norm_cell = tf.norm(coordinate_diff, axis=2, keepdims=True)

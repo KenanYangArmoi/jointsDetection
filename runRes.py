@@ -8,7 +8,7 @@ import os
 
 train_batch_size = 32
 vali_batch_size = 400
-MAX_STEP = 10000
+MAX_STEP = 15000
 
 
 logs_dir = '/home/Kenany/db/logs'
@@ -120,9 +120,10 @@ def run_model():
                         saver.save(sess, checkpoint_path, global_step=step)
                     else:
                         plateaus = plateaus + 1
-                        if plateaus == 2:
+                        if plateaus == 5:
                             plateaus = 0
                             learn = learn / 5
+                                print('Learning rate: %f' % (learn))
         except tf.errors.OutOfRangeError:
             print('Done training -- epoch limit reached')
         finally:

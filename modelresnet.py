@@ -316,17 +316,20 @@ class Model:
         #                            [x1, y1],
         #                              ...
         #                            [x13,y13]] in each batch cell
-        with tf.variable_scope('loss') as scope:
+        with tf.variable_scope('loss'):
             logits_xy = tf.reshape(logits, [batch_size, 14, 2])
-            coordinate_diff = (logits_xy - labels) * (marks + 1E-10)
-            norm_cell = tf.norm(coordinate_diff, axis=2, keepdims=True)
-            loss = tf.reduce_mean(norm_cell, name='loss')
+            # coordinate_diff = (logits_xy - labels) * (marks + 1E-10)
+            # norm_cell = tf.norm(coordinate_diff, axis=2, keepdims=True)
+            # loss = tf.reduce_mean(norm_cell, name='loss')
+            # not using l2 distance, calculate the distance of x and y seperately
+            loss = tf.losses.mean_squared_error(labels * marks, logits_xy * marks)
+            loss = tf.add(loss, 0, name='loss')
             tf.summary.scalar(scope.name + '/loss', loss)
             return loss
 
     def training(self, loss, learning_rate):
         # use adam to do optimization, learning_rate = (1e-3, 5e-4)
-        with tf.variable_scope('train') as scope:
+        with tf.variable_scope('train'):
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
                 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -335,11 +338,11 @@ class Model:
             return train_op
 
     def evaluate(self, logits, labels, marks, batch_size):
-        with tf.variable_scope('accuracy') as scope:
+        with tf.variable_scope('accuracy'):
             logits_xy = tf.reshape(logits, [batch_size, 14, 2])
             coordinate_diff = (logits_xy - labels) * marks
             norm_cell = tf.norm(coordinate_diff, axis=2, keepdims=True)
-            accuracy = 1 - tf.reduce_mean(norm_cell / 1.42)  # 1.42 is the approximation of sqrt(2)
+            accuracy = 1 - tf.reduce_mean(norm_cell / .142)  # .142 is the approximation of 0.1*sqrt(2)
             accuracy = tf.add(accuracy, 0, name='accuracy')
             tf.summary.scalar(scope.name + '/accuracy', accuracy)
         return accuracy

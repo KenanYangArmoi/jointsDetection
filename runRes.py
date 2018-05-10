@@ -6,8 +6,8 @@ import tensorflow as tf
 import numpy as np
 import os
 
-train_batch_size = 128
-vali_batch_size = 1000
+train_batch_size = 1
+vali_batch_size = 8
 MAX_STEP = 10000
 
 

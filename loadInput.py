@@ -42,7 +42,7 @@ class loadInput():
         return image_dir
 
     def get_train_validation_test_set(self, image_dir, labels, marks, Pweights): # 10% to validate and 0% to test
-        validation_size = 1000
+        validation_size = 500
         test_size = 0
         partitions = [0] * 10000
         partitions[:validation_size] = [1] * validation_size

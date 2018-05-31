@@ -7,7 +7,7 @@ import numpy as np
 import os
 # import evaluation
 
-train_batch_size = 64
+train_batch_size = 48
 vali_batch_size = 1000
 MAX_STEP = 10000
 

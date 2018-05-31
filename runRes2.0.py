@@ -9,7 +9,7 @@ import os
 
 train_batch_size = 32
 vali_batch_size = 500
-MAX_STEP = 10000
+MAX_STEP = 25000
 
 
 logs_dir = '/home/Kenany/logs'
@@ -150,7 +150,7 @@ def run_model():
 
                     else:
                         plateaus = plateaus + 1
-                        if plateaus == 2:
+                        if plateaus == 5:
                             plateaus = 0
                             learn = learn / 5
         except tf.errors.OutOfRangeError:

@@ -7,21 +7,20 @@ import numpy as np
 import os
 
 train_batch_size = 128
-vali_batch_size = 800
-# learning_rate = 1E-3
+vali_batch_size = 1000
+# learning_rate = 1E-4
 # Round_1_STEP = 1
 MAX_STEP = 10000
 
+vali_acc_highest = 0
 
+logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs'
+vali_logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs/vali'
 
+files_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/new_images/'
 
-logs_dir = '/home/Kenany/db/logs'
-vali_logs_dir = '/home/Kenany/db/logs/vali'
-
-files_dir = '/home/Kenany/crop/new_images_crop/'
-
-mark_dir = '/home/Kenany/document/joints_mark.mat'
-label_dir = '/home/Kenany/crop/crop_coordinate.mat'
+mark_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/joints_mark.mat'
+label_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/joints_label_positive.mat'
 
 # load data:
 l_d = loadInput.loadInput()
@@ -33,13 +32,14 @@ train_image_dir, vali_image_dir, test_image_dir, \
 train_label, vali_label, test_label, train_mark, \
 vali_mark, test_mark = l_d.get_train_validation_test_set(file_dir, labels, marks)
 
-keep_prop = tf.placeholder(tf.float32,name='prop')
-is_training = tf.placeholder(tf.bool,name='is_training')
-batch_size = tf.placeholder(tf.int32,name='b_s')
-image_batch = tf.placeholder(tf.float32,name='im_b')
-label_batch = tf.placeholder(tf.float32,name='l_b')
-mark_batch = tf.placeholder(tf.float32,name='m_b')
+keep_prop = tf.placeholder(tf.float32, name='prop')
+is_training = tf.placeholder(tf.bool, name='is_training')
+batch_size = tf.placeholder(tf.int32, name='b_s')
+image_batch = tf.placeholder(tf.float32, name='im_b')
+label_batch = tf.placeholder(tf.float32, name='l_b')
+mark_batch = tf.placeholder(tf.float32, name='m_b')
 learning_rate = tf.placeholder(tf.float32, name='l_rate')
+
 
 def run_model():
     # get training batch
@@ -54,8 +54,8 @@ def run_model():
     # calculate the loss
     loss = md.loss(logits, label_batch, mark_batch, batch_size)
 
-    #calculate the accuracy
-    acc = md.evaluate(logits, label_batch, mark_batch, batch_size )
+    # calculate the accuracy
+    acc = md.evaluate(logits, label_batch, mark_batch, batch_size)
 
     # do optimization
     train_op = md.training(loss, learning_rate=learning_rate)
@@ -75,11 +75,11 @@ def run_model():
         saver = tf.train.Saver(max_to_keep=3)
         # initialize the variables
         sess.run(tf.global_variables_initializer())
-        
+
         vali_acc_highest = 0
         learn = 1E-3
         plateaus = 0
-        
+
         vali_batch = l_d.get_validation_images(vali_image_dir)
         vali_value = {
             keep_prop: 1,
@@ -103,20 +103,19 @@ def run_model():
                 ##########################
                 #####start training#######
                 train_value = {
-                    keep_prop : 0.8,
+                    keep_prop: 0.8,
                     is_training: True,
-                    batch_size : train_batch_size,
-                    image_batch : sess.run(train_image_batch),
-                    label_batch : sess.run(train_label_batch),
-                    mark_batch : sess.run(train_mark_batch),
-                    learning_rate : learn
+                    batch_size: train_batch_size,
+                    image_batch: sess.run(train_image_batch),
+                    label_batch: sess.run(train_label_batch),
+                    mark_batch: sess.run(train_mark_batch),
+                    learning_rate: learn
                 }
-                _,tra_loss, tra_acc = sess.run([train_op, loss, acc],feed_dict=train_value)
+                _, tra_loss, tra_acc = sess.run([train_op, loss, acc], feed_dict=train_value)
                 ##########################
                 ##########################
                 if step % 50 == 0:
                     # tra_loss, tra_acc = sess.run([train_loss, train_acc])
-
 
                     # vali_value = {
                     #     keep_prop: 1,
@@ -155,9 +154,8 @@ def run_model():
                         plateaus = plateaus + 1
                         if plateaus == 2:
                             plateaus = 0
-                            learn = learn/10
-                        
-                                
+                            learn = learn / 10
+
                     # acc = accuracy_evaluation(vali_image_dir, vali_label, vali_mark, batch_size)
                     # print('validation accuracy: %.5f' % (acc))
         except tf.errors.OutOfRangeError:
@@ -166,7 +164,6 @@ def run_model():
             coord.request_stop()
         coord.join(threads)
         sess.close()
-
 
 
 # def keep_training():

@@ -2,29 +2,29 @@ import tensorflow as tf
 import os
 import numpy as np
 
-file_dir = '/home/Kenany/document/new_images/im00552.jpg'
-logs_dir = '/home/Kenany/db/logs/vali'
+file_dir = '/Users/kenanyang/Desktop/Armoi/data/image/im00552.jpg'
+logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs/vali'
 
 def prediction(logs_dir, file_dir):
     with tf.Session() as sess:
-        model_dir = os.path.join(logs_dir, 'model.ckpt-3000.meta')
+        model_dir = os.path.join(logs_dir, 'model.ckpt-9.meta')
         ckpt = tf.train.get_checkpoint_state(logs_dir)
         saver = tf.train.import_meta_graph(model_dir)
         saver.restore(sess, ckpt.model_checkpoint_path)
 
         graph = tf.get_default_graph()
-        logits = graph.get_tensor_by_name("Out_layer/logits:0")
+
         keep_prop = graph.get_tensor_by_name("prop:0")
         is_training = graph.get_tensor_by_name("is_training:0")
         batch_size = graph.get_tensor_by_name("b_s:0")
         image_batch = graph.get_tensor_by_name("im_b:0")
-
+        logits = graph.get_tensor_by_name("output_layer/logits:0")
         # keep_prop = tf.placeholder(tf.float32, name='prop')
         # is_training = tf.placeholder(tf.bool, name='is_training')
         # batch_size = tf.placeholder(tf.int32, name='b_s')
         # image_batch = tf.placeholder(tf.float32, name='im_b')
 
-        target_H, target_W, num_channels = 220, 220, 3
+        target_H, target_W, num_channels = 224, 224, 3
         image_file = tf.read_file(file_dir)
         image = tf.image.decode_jpeg(image_file, channels=3)
         image.set_shape([target_H, target_W, num_channels])
@@ -39,10 +39,10 @@ def prediction(logs_dir, file_dir):
         }
 
         y = sess.run([logits], feed_dict)
-        _xy = np.reshape(y, [14, 2])
-        xy = np.add(np.multiply(_xy, 220),110)
+        _xy = np.reshape(y, [14, 3])
+        # xy = np.add(np.multiply(_xy, 220),110)
 
-        return xy
+        return _xy
 
 y = prediction(logs_dir, file_dir)
 print(y)

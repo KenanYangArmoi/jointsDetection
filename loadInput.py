@@ -8,21 +8,29 @@ import random
 
 class loadInput():
 
-    def get_labels(self, mark_dir, label_dir):
+    def get_labels(self, mark_dir, label_dir, Pweight_dir):
         mark_mat = sio.loadmat(mark_dir)
         label_mat = sio.loadmat(label_dir)
+        Pweight_mat = sio.loadmat(Pweight_dir)
         marks_mat = mark_mat['joints_mark']
         labels_mat = label_mat['ResLabel']
+        Pweights_mat = Pweight_mat['Pweight']
 
         # marks = np.array(marks_mat)  # marks in a shape of (14 ,1, 10000)
         marks_tf = tf.cast(marks_mat, tf.float32)
         marks_t = tf.transpose(marks_tf,
                                perm=[2, 0, 1])  # marks_t in a shape of [10000, 14 ,1], with format tf.float32
+
+        # Pweights = np.array(Pweights_mat)  # Pweights in a shape of (14 ,1, 10000)
+        Pweights_tf = tf.cast(Pweights_mat, tf.float32)
+        Pweights_t = tf.transpose(Pweights_tf,
+                               perm=[2, 0, 1])  # Pwights_t in a shape of [10000, 14 ,1], with format tf.float32
+
         # labels = np.array(labels_mat)  # labels in a shape of (14 ,2, 10000)
         labels_tf = tf.cast(labels_mat, tf.float32)
         labels_t = tf.transpose(labels_tf,
                                 perm=[2, 0, 1])  # labels_t in a shape of [10000, 14, 2], with format tf.float32
-        return labels_t, marks_t
+        return labels_t, marks_t, Pweights_t
 
     def get_file_dir(self, file_dir):
         # file_dir = '/Users/kenanyang/Desktop/Armoi/lspet_dataset/images/'
@@ -33,9 +41,9 @@ class loadInput():
         image_dir = tf.cast(image_dir, tf.string) # In tensorflow format
         return image_dir
 
-    def get_train_validation_test_set(self, image_dir, labels, marks): # 10% to validate and 10% to test
-        validation_size = 400
-        test_size = 1000
+    def get_train_validation_test_set(self, image_dir, labels, marks, Pweights): # 10% to validate and 0% to test
+        validation_size = 1
+        test_size = 0
         partitions = [0] * 10000
         partitions[:validation_size] = [1] * validation_size
         partitions[validation_size:validation_size+test_size] = [2] * test_size
@@ -44,23 +52,26 @@ class loadInput():
         train_image_dir, vali_image_dir, test_image_dir = tf.dynamic_partition(image_dir, partitions, 3)
         train_label, vali_label, test_label = tf.dynamic_partition(labels, partitions, 3)
         train_mark, vali_mark, test_mark = tf.dynamic_partition(marks, partitions, 3)
+        train_Pweights, vali_Pweights, test_Pweights = tf.dynamic_partition(Pweights, partitions, 3)
 
         return train_image_dir, vali_image_dir, test_image_dir,\
                train_label, vali_label, test_label,\
-               train_mark, vali_mark, test_mark
+               train_mark, vali_mark, test_mark,\
+               train_Pweights, vali_Pweights, test_Pweights
 
-    def get_batch(self, image_dir, labels, marks, batch_size):
+    def get_batch(self, image_dir, labels, marks, Pweights, batch_size):
         target_H = 224
         target_W = 224
         num_channels = 3
         # new_central = tf.constant(110, dtype=tf.float32, shape=[14,2]) # new_central = [target_H/2, target_W/2]
 
         # create the queues
-        input_queue = tf.train.slice_input_producer([image_dir, labels, marks])
+        input_queue = tf.train.slice_input_producer([image_dir, labels, marks, Pweights])
         # handle each slice
         image_content = tf.read_file(input_queue[0])
         label = input_queue[1]
         mark = input_queue[2]
+        Pweight = input_queue[3]
         image = tf.image.decode_jpeg(image_content, channels=3)
 
         # # Modify the size of the image
@@ -81,10 +92,11 @@ class loadInput():
         # Normalize Image
         image.set_shape([target_H, target_W, num_channels])
         im_standardized = tf.image.per_image_standardization(image)
-        image_batch, label_batch, mark_batch = tf.train.batch([im_standardized, label, mark], batch_size=batch_size)
+        image_batch, label_batch, mark_batch, Pweights_batch = \
+            tf.train.batch([im_standardized, label, mark, Pweight], batch_size=batch_size)
 
 
-        return image_batch, label_batch, mark_batch
+        return image_batch, label_batch, mark_batch, Pweights_batch
 
     # def modify_image(self, sess_batch, image, target_H, target_W):
     #

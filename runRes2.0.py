@@ -7,19 +7,19 @@ import numpy as np
 import os
 # import evaluation
 
-train_batch_size = 1
-vali_batch_size = 1
-MAX_STEP = 10
+train_batch_size = 128
+vali_batch_size = 1000
+MAX_STEP = 10000
 
 
-logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs'
-vali_logs_dir = '/Users/kenanyang/Desktop/Armoi/TF/logs/vali'
+logs_dir = '/home/Kenany/logs'
+vali_logs_dir = '/home/Kenany/logs/vali'
 
-files_dir = '/Users/kenanyang/Desktop/Armoi/data/image/'
+files_dir = '/home/Kenany/data/image/'
 
-mark_dir = '/Users/kenanyang/Desktop/Armoi/data/joints_mark.mat'
-label_dir = '/Users/kenanyang/Desktop/Armoi/data/ResLabel.mat'
-Pweight_dir = '/Users/kenanyang/Desktop/Armoi/data/Pweight.mat'
+mark_dir = '/home/Kenany/data/joints_mark.mat'
+label_dir = '/home/Kenany/data/ResLabel.mat'
+Pweight_dir = '/home/Kenany/data/Pweight.mat'
 
 # load data:
 l_d = loadInput.loadInput()
@@ -101,7 +101,7 @@ def run_model():
                 }
                 _, tra_loss = sess.run([train_op, loss], feed_dict=train_value)
 
-                if step % 1 == 0:
+                if step % 50 == 0:
 
                     print('Step %d, train loss = %.5f' % (step, tra_loss))
 
@@ -109,7 +109,7 @@ def run_model():
                     train_writer.add_summary(summary_str, step)
 
 
-                if step % 10 == 0 or (step + 1) == MAX_STEP:
+                if step % 500 == 0 or (step + 1) == MAX_STEP:
                     vali_logits = sess.run(logits, feed_dict=validation_feed_value)
 
                     logits_bpxy = tf.reshape(vali_logits, [vali_batch_size, 14, 3])

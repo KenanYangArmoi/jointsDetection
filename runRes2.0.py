@@ -112,7 +112,7 @@ def run_model():
                 }
                 _, tra_loss = sess.run([train_op, loss], feed_dict=train_value)
 
-                if step % 1 == 0:
+                if step % 50 == 0:
 
                     print('Step %d, train loss = %.5f' % (step, tra_loss))
 
@@ -120,7 +120,7 @@ def run_model():
                     train_writer.add_summary(summary_str, step)
 
 
-                if step % 10 == 0 or (step + 1) == MAX_STEP:
+                if step % 1000 == 0 or (step + 1) == MAX_STEP:
                     vali_logits = sess.run(logits, feed_dict=validation_feed_value)
 
                     logits_bpxy = np.reshape(vali_logits, [vali_batch_size, 14, 3])

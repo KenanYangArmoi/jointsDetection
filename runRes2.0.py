@@ -7,9 +7,9 @@ import numpy as np
 import os
 # import evaluation
 
-train_batch_size = 256
+train_batch_size = 64
 vali_batch_size = 1
-MAX_STEP = 10000
+MAX_STEP = 20000
 
 
 logs_dir = '/home/Kenany/logs'

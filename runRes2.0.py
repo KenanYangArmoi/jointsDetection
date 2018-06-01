@@ -8,7 +8,7 @@ import os
 # import evaluation
 
 train_batch_size = 256
-vali_batch_size = 500
+vali_batch_size = 1
 MAX_STEP = 10000
 
 

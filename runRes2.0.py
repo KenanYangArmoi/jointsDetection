@@ -7,9 +7,9 @@ import numpy as np
 import os
 # import evaluation
 
-train_batch_size = 32
+train_batch_size = 256
 vali_batch_size = 500
-MAX_STEP = 25000
+MAX_STEP = 10000
 
 
 logs_dir = '/home/Kenany/logs'
@@ -20,6 +20,15 @@ files_dir = '/home/Kenany/data/image/'
 mark_dir = '/home/Kenany/data/joints_mark.mat'
 label_dir = '/home/Kenany/data/ResLabel.mat'
 Pweight_dir = '/home/Kenany/data/Pweight.mat'
+
+# logs_dir = '/Users/kenanyang/Desktop/Armoi/data/logs'
+# vali_logs_dir = '/Users/kenanyang/Desktop/Armoi/data/logs/vali'
+#
+# files_dir = '//Users/kenanyang/Desktop/Armoi/data/image/'
+#
+# mark_dir = '/Users/kenanyang/Desktop/Armoi/data/joints_mark.mat'
+# label_dir = '/Users/kenanyang/Desktop/Armoi/data/ResLabel.mat'
+# Pweight_dir = '/Users/kenanyang/Desktop/Armoi/data/Pweight.mat'
 
 # load data:
 l_d = loadInput.loadInput()
@@ -80,6 +89,8 @@ def run_model():
             is_training: False,
             image_batch: validation_batch
         }
+        vali_marks = sess.run(vali_mark)
+        vali_labels = sess.run(vali_label)
 
         # initialize the queue threads to start to shovel data
         coord = tf.train.Coordinator()
@@ -101,7 +112,7 @@ def run_model():
                 }
                 _, tra_loss = sess.run([train_op, loss], feed_dict=train_value)
 
-                if step % 50 == 0:
+                if step % 1 == 0:
 
                     print('Step %d, train loss = %.5f' % (step, tra_loss))
 
@@ -109,29 +120,33 @@ def run_model():
                     train_writer.add_summary(summary_str, step)
 
 
-                if step % 500 == 0 or (step + 1) == MAX_STEP:
+                if step % 10 == 0 or (step + 1) == MAX_STEP:
                     vali_logits = sess.run(logits, feed_dict=validation_feed_value)
 
-                    logits_bpxy = tf.reshape(vali_logits, [vali_batch_size, 14, 3])
+                    logits_bpxy = np.reshape(vali_logits, [vali_batch_size, 14, 3])
 
-                    logits_pbxy = tf.transpose(logits_bpxy, perm=[2, 0, 1])
-                    logits_marks = tf.reshape(logits_pbxy[0], [batch_size, 14, 1])
-                    logits_xy = tf.transpose(logits_pbxy[-2:], perm=[1, 2, 0])
-                    logits_marks_sigmoid = tf.sigmoid(logits_marks)
+                    logits_pbxy = np.transpose(logits_bpxy, [2, 0, 1])
 
-                    mark_diff_abs = tf.abs(vali_mark - logits_marks_sigmoid)
-                    mark_diff = sess.run(vali_mark - logits_marks_sigmoid, feed_dict={batch_size: vali_batch_size})
+                    logits_marks = np.reshape(logits_pbxy[0], [vali_batch_size, 14, 1])
+
+                    logits_xy = np.transpose(logits_pbxy[-2:], [1, 2, 0])
+                    logits_marks_sigmoid = sigmoid_array(logits_marks)
+                    mark_diff = vali_marks - logits_marks_sigmoid
+                    print(mark_diff)
+                    mark_diff_abs = np.abs(mark_diff)
+
                     total_mark = 0
                     correct_mark = 0
                     batch_index = 0
-                    for batch in sess.run(mark_diff_abs, feed_dict={batch_size: vali_batch_size}):
+                    print(mark_diff_abs)
+                    for batches in mark_diff_abs:
                         value_index = 0
-                        for value in batch:
+                        for value in batches:
                             total_mark = total_mark +1
                             if value < 0.1:
                                 xy = logits_xy[batch_index][value_index]
-                                dx = sess.run(tf.abs(xy[0]-vali_label[batch_index][value_index][0]))
-                                dy = sess.run(tf.abs(xy[1]-vali_label[batch_index][value_index][1]))
+                                dx = np.abs(xy[0]-vali_labels[batch_index][value_index][0])
+                                dy = np.abs(xy[1]-vali_labels[batch_index][value_index][1])
                                 if mark_diff[batch_index][value_index] < 0:
                                     correct_mark = correct_mark + 1
                                 elif dx<0.1 and dy<0.1:
@@ -160,6 +175,9 @@ def run_model():
         train_writer.close()
         coord.join(threads)
         sess.close()
+
+def sigmoid_array(x):
+     return 1 / (1 + np.exp(-x))
 
 
 
